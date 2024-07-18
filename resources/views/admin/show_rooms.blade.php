@@ -82,7 +82,7 @@
             justify-content: space-around;
         }
         .room-card {
-            background: #f9f9f9;
+            background:#f9f9f9;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -108,7 +108,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Hotel Admin</a>
+            <a class="navbar-brand" href="#">Choose where you stay</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -161,115 +161,112 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        const checkAvailabilityRoute = '{{ route("checkAvailability") }}';
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
 
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
 
-            const formData = new FormData(form);
-            const response = await fetch(checkAvailabilityRoute, 
-            {
-    method: 'POST',
-    body: formData
-             });
+                const formData = new FormData(form);
+                const response = await fetch('{{ route("checkAvailability") }}', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data); 
-                displayAvailableRooms(data);
-            } else {
-                alert('Error checking availability. Please try again.');
-            }
-        });
-
-        function displayAvailableRooms(rooms) {
-    const roomsContainer = document.getElementById('rooms-container');
-    roomsContainer.innerHTML = '';
-
-    rooms.forEach(room => {
-        const roomCard = document.createElement('div');
-        roomCard.classList.add('room-card');
-
-        const carousel = document.createElement('div');
-        carousel.classList.add('carousel', 'slide');
-        carousel.setAttribute('data-ride', 'carousel');
-        carousel.id = `carousel-${room.id}`;
-
-        const carouselInner = document.createElement('div');
-        carouselInner.classList.add('carousel-inner');
-
-        if (room.images && room.images.length > 0) {
-            room.images.forEach((image, index) => {
-                const carouselItem = document.createElement('div');
-                carouselItem.classList.add('carousel-item');
-                if (index === 0) carouselItem.classList.add('active');
-
-                const img = document.createElement('img');
-                img.src = image.image_path;
-                img.classList.add('d-block', 'w-100');
-
-                carouselItem.appendChild(img);
-                carouselInner.appendChild(carouselItem);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data); // Verify data in console
+                    displayAvailableRooms(data);
+                } else {
+                    alert('Error checking availability. Please try again.');
+                }
             });
 
-            carousel.appendChild(carouselInner);
+            function displayAvailableRooms(rooms) {
+                const roomsContainer = document.getElementById('rooms-container');
+                roomsContainer.innerHTML = '';
 
-            const prevButton = document.createElement('a');
-            prevButton.classList.add('carousel-control-prev');
-            prevButton.href = `#carousel-${room.id}`;
-            prevButton.setAttribute('role', 'button');
-            prevButton.setAttribute('data-slide', 'prev');
-            prevButton.innerHTML = `<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Previous</span>`;
+                rooms.forEach(room => {
+                    const roomCard = document.createElement('div');
+                    roomCard.classList.add('room-card');
 
-            const nextButton = document.createElement('a');
-            nextButton.classList.add('carousel-control-next');
-            nextButton.href = `#carousel-${room.id}`;
-            nextButton.setAttribute('role', 'button');
-            nextButton.setAttribute('data-slide', 'next');
-            nextButton.innerHTML = `<span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="sr-only">Next</span>`;
+                    const carousel = document.createElement('div');
+                    carousel.classList.add('carousel', 'slide');
+                    carousel.setAttribute('data-ride', 'carousel');
+                    carousel.id = `carousel-${room.id}`;
 
-            carousel.appendChild(prevButton);
-            carousel.appendChild(nextButton);
-        } else {
-            const noImageMessage = document.createElement('p');
-            noImageMessage.textContent = 'No images available';
-            carouselInner.appendChild(noImageMessage);
-        }
+                    const carouselInner = document.createElement('div');
+                    carouselInner.classList.add('carousel-inner');
 
-        const roomTitle = document.createElement('h3');
-        roomTitle.textContent = room.room_title;
+                    if (room.images && room.images.length > 0) {
+                        room.images.forEach((image, index) => {
+                            const carouselItem = document.createElement('div');
+                            carouselItem.classList.add('carousel-item');
+                            if (index === 0) carouselItem.classList.add('active');
 
-        const roomDescription = document.createElement('p');
-        roomDescription.textContent = room.description;
+                            const img = document.createElement('img');
+                            img.src = image.image_path;
+                            img.classList.add('d-block', 'w-100');
 
-        const roomPrice = document.createElement('span');
-        roomPrice.textContent = `Price: $${room.price}`;
+                            carouselItem.appendChild(img);
+                            carouselInner.appendChild(carouselItem);
+                        });
 
-        const detailsButton = document.createElement('a');
-        detailsButton.href = `/room_details/${room.id}`;
-        detailsButton.textContent = 'View Details';
-        detailsButton.classList.add('availability-button');
-        detailsButton.style.marginTop = '10px';
-        detailsButton.style.display = 'inline-block';
+                        carousel.appendChild(carouselInner);
 
-        roomCard.appendChild(carousel);
-        roomCard.appendChild(roomTitle);
-        roomCard.appendChild(roomDescription);
-        roomCard.appendChild(roomPrice);
-        roomCard.appendChild(detailsButton);
+                        const prevButton = document.createElement('a');
+                        prevButton.classList.add('carousel-control-prev');
+                        prevButton.href = `#carousel-${room.id}`;
+                        prevButton.setAttribute('role', 'button');
+                        prevButton.setAttribute('data-slide', 'prev');
+                        prevButton.innerHTML = `<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Previous</span>`;
 
-        roomsContainer.appendChild(roomCard);
-    });
+                        const nextButton = document.createElement('a');
+                        nextButton.classList.add('carousel-control-next');
+                        nextButton.href = `#carousel-${room.id}`;
+                        nextButton.setAttribute('role', 'button');
+                        nextButton.setAttribute('data-slide', 'next');
+                        nextButton.innerHTML = `<span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="sr-only">Next</span>`;
 
-    document.getElementById('rooms-wrapper').classList.remove('hidden');
-}
+                        carousel.appendChild(prevButton);
+                        carousel.appendChild(nextButton);
+                    } else {
+                        const noImageMessage = document.createElement('p');
+                        noImageMessage.textContent = 'No images available';
+                        carouselInner.appendChild(noImageMessage);
+                    }
 
-    });
-</script>
+                    const roomTitle = document.createElement('h3');
+                    roomTitle.textContent = room.room_title;
+
+                    const roomDescription = document.createElement('p');
+                    roomDescription.textContent = room.description;
+
+                    const roomPrice = document.createElement('span');
+                    roomPrice.textContent = `Price: $${room.price}`;
+
+                    const detailsButton = document.createElement('a');
+                    detailsButton.href = `{{ url('/room_details') }}/${room.id}?startDate=${encodeURIComponent(document.getElementById('checkin').value)}&endDate=${encodeURIComponent(document.getElementById('checkout').value)}`;
+                    detailsButton.textContent = 'View Details';
+                    detailsButton.classList.add('availability-button');
+                    detailsButton.style.marginTop = '10px';
+                    detailsButton.style.display = 'inline-block';
+
+                    roomCard.appendChild(carousel);
+                    roomCard.appendChild(roomTitle);
+                    roomCard.appendChild(roomDescription);
+                    roomCard.appendChild(roomPrice);
+                    roomCard.appendChild(detailsButton);
+
+                    roomsContainer.appendChild(roomCard);
+                });
+
+                document.getElementById('rooms-wrapper').classList.remove('hidden');
+            }
+        });
+    </script>
 
 </body>
 </html>

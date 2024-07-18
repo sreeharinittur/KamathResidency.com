@@ -133,8 +133,7 @@
                         </a>
                     </td>
                     <td>
-                    <a href="{{url('approve_book',$data->id)}}" class="approve">Approve</a><br><br>
-                    <a href="{{url('reject_book',$data->id)}}" class="reject">Reject</a>
+                    
 
                     </td>
                 </tr>

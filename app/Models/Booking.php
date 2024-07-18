@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,18 +8,21 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'room_id',
         'name',
         'email',
         'phone',
+        'payment_status',
+        'status',
         'start_date',
-        'end_date'
-
+        'end_date',
+        'amount',
+        'refund_amount'
     ];
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'room_id', 'id');
+        return $this->belongsTo(Room::class);
     }
 }

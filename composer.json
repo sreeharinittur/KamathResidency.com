@@ -11,7 +11,11 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.0",
-        "stripe/stripe-php": "^14.9"
+        "plivo/plivo-php": "^4.65",
+        "razorpay/razorpay": "2.*",
+        "stripe/stripe-php": "^15.0",
+        "twilio/sdk": "^8.2",
+        "vonage/client": "^4.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

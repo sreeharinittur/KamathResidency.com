@@ -58,20 +58,20 @@
                         <div class="collapse navbar-collapse" id="navbarsExample04">
                            <ul class="navbar-nav mr-auto">
                               <li class="nav-item active">
-                                 <a class="nav-link" href="index.html">Home</a>
+                                 <a class="nav-link" href="{{ url('index') }}">Home</a>
                               </li>
                               <li class="nav-item">
-                                 <a class="nav-link" href="about.html">About</a>
+                                 <a class="nav-link" href="{{ url('about') }}">About</a>
                               </li>
                               <li class="nav-item">
                                  <a class="nav-link" href="{{url('rooms')}}">Rooms</a>
                               </li>
                               <li class="nav-item">
-                                 <a class="nav-link" href="{{url('menu')}}">Gallery</a>
+                                 <a class="nav-link" href="{{url('gallery')}}">Gallery</a>
                               </li>
                               
                               <li class="nav-item">
-                                 <a class="nav-link" href="contact.html">Contact Us</a>
+                                 <a class="nav-link" href="{{ url('contact') }}">Contact Us</a>
                               </li>
                               
                               

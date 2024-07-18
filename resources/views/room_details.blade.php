@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Room Details</title>
-     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -133,7 +132,7 @@
                         <div class="form-container">
                             @if(session()->has('message'))
                                 <div class="alert alert-success">
-                                    {{session()->get('message')}}
+                                    {{ session()->get('message') }}
                                 </div>
                             @endif
 
@@ -142,8 +141,10 @@
                                     <div class="alert alert-danger">{{ $error }}</div>
                                 @endforeach
                             @endif
-                            <form action="{{url('add_booking',$room->id)}}" method="Post">
+                            
+                            <form action="{{ route('payment_page', ['id' => $room->id]) }}" method="GET">
                                 @csrf
+                                <input type="hidden" name="room_id" value="{{ $room->id }}">
                                 <div>
                                     <label for="name">Name</label>
                                     <input type="text" id="name" name="name" required value="{{ Auth::check() ? Auth::user()->name : old('name') }}">
@@ -158,14 +159,18 @@
                                 </div>
                                 <div>
                                     <label for="startDate">Start Date</label>
-                                    <input type="date" id="startDate" name="startDate" required>
+                                    <input type="date" id="startDate" name="startDate" required readonly>
                                 </div>
                                 <div>
                                     <label for="endDate">End Date</label>
-                                    <input type="date" id="endDate" name="endDate" required>
+                                    <input type="date" id="endDate" name="endDate"  required readonly>
+                                </div>
+                                <div>
+                                    <label for="amount">Amount</label>
+                                    <input type="amount" id="amount" name="amount"  value="{{ $room->price }}" readonly>
                                 </div>
                                 <div class="mt-3">
-                                    <input type="submit" class="btn btn-book" value="Book Now">
+                                <input type="submit" class="btn btn-primary" value="Book Now"/>
                                 </div>
                             </form>
                         </div>
@@ -179,35 +184,50 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-    $(function() {
-        var dtToday = new Date();
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startDate = urlParams.get('startDate');
+            const endDate = urlParams.get('endDate');
+            console.log("Hii");
+            console.log('{{$room->id}}');
 
-        var month = dtToday.getMonth() + 1;
-        var day = dtToday.getDate();
-        var year = dtToday.getFullYear();
+            document.getElementById('startDate').value = startDate;
+            document.getElementById('endDate').value = endDate;
 
-        if(month < 10) month = '0' + month.toString();
-        if(day < 10) day = '0' + day.toString();
+            var dtToday = new Date();
 
-        var maxDate = year + '-' + month + '-' + day;
-        $('#startDate').attr('min', maxDate);
-        $('#endDate').attr('min', maxDate);
-
-        $('#startDate').on('change', function() {
-            var startDate = new Date($(this).val());
-            startDate.setDate(startDate.getDate() + 1);
-
-            var month = startDate.getMonth() + 1;
-            var day = startDate.getDate();
-            var year = startDate.getFullYear();
+            var month = dtToday.getMonth() + 1;
+            var day = dtToday.getDate();
+            var year = dtToday.getFullYear();
 
             if(month < 10) month = '0' + month.toString();
             if(day < 10) day = '0' + day.toString();
 
-            var minEndDate = year + '-' + month + '-' + day;
-            $('#endDate').attr('min', minEndDate);
+            var maxDate = year + '-' + month + '-' + day;
+            $('#startDate').attr('min', maxDate);
+            $('#endDate').attr('min', maxDate);
+
+            $('#startDate').on('change', function() {
+                var startDate = new Date($(this).val());
+                startDate.setDate(startDate.getDate());
+
+                var month = startDate.getMonth() + 1;
+                var day = startDate.getDate();
+                var year = startDate.getFullYear();
+
+                if(month < 10) month = '0' + month.toString();
+                if(day < 10) day = '0' + day.toString();
+
+                var minEndDate = year + '-' + month + '-' + day;
+                $('#endDate').attr('min', minEndDate);
+            });
+
+           
+            
+        
         });
-    });
-</script>
+    </script>
+    
+
 </body>
 </html>
