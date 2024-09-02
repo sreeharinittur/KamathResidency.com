@@ -9,14 +9,16 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f5f5dc;
             color: #333;
         }
         .navbar {
             margin-bottom: 50px;
+            background-color: #2B1103;
         }
         .container {
             margin-top: 30px;
+            
         }
         .booking-form-wrapper {
             background: white;
@@ -103,31 +105,42 @@
             font-weight: bold;
             color: #333;
         }
+        
+    .btn{
+   display: inline-block;
+   cursor: pointer;
+   padding: 1rem 3rem;
+   border: var(--border);
+   font-size: 1.8rem;
+   color: var(--sub-color);
+   text-align: center;
+   text-transform: capitalize;
+   transition: .2s linear;
+   margin-top: 1rem;
+   background-color: var(--main-color);
+
+}
+
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar">
         <div class="container">
-            <a class="navbar-brand" href="#">Choose where you stay</a>
+            <a class="navbar-brand" style="color:white;" href="#">Choose where you stay</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Dashboard</a>
+                        <a class="btn" href="{{url('/')}}">Home</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="btn" href="#">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Rooms</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Bookings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Logout</a>
+                        <a class="btn" href="{{url('/logout')}}">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -137,16 +150,16 @@
     <div class="container">
         <h2>Rooms</h2>
         
-        <div class="booking-form-wrapper">
+        <div class="booking-form-wrapper" style="border:2px solid brown">
             <form class="booking-form" id="booking-form" action="{{ route('checkAvailability') }}" method="POST">
                 @csrf
                 <div class="date-input-group">
                     <label for="checkin">Check-in Date:</label>
-                    <input type="date" id="checkin" name="checkin" class="datepicker">
+                    <input type="date" id="checkin" name="checkin" class="datepicker" style="border:2px solid brown">
                 </div>
                 <div class="date-input-group">
                     <label for="checkout">Check-out Date:</label>
-                    <input type="date" id="checkout" name="checkout" class="datepicker">
+                    <input type="date" id="checkout" name="checkout" class="datepicker" style="border:2px solid brown">
                 </div>
                 <button type="submit" class="availability-button" id="check-availability">Check Availability</button>
             </form>
@@ -163,8 +176,56 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
+            const checkinInput = document.getElementById('checkin');
+            const checkoutInput = document.getElementById('checkout');
+
+            function formatDate(date) {
+                const d = new Date(date);
+                let month = '' + (d.getMonth() + 1);
+                let day = '' + d.getDate();
+                const year = d.getFullYear();
+
+                if (month.length < 2) month = '0' + month;
+                if (day.length < 2) day = '0' + day;
+
+                return [year, month, day].join('-');
+            }
+
+            function setMinDate(input) {
+                const today = new Date();
+                const minDate = formatDate(today);
+                input.setAttribute('min', minDate);
+            }
+
+            function validateDates(event) {
+                const checkinDate = new Date(checkinInput.value);
+                const checkoutDate = new Date(checkoutInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (checkinDate < today || checkoutDate < today) {
+                    alert('Check-in and Check-out dates cannot be in the past.');
+                    event.preventDefault();
+                    return false;
+                }
+
+                if (checkinDate > checkoutDate) {
+                    alert('Check-in date must be before or equal to Check-out date.');
+                    event.preventDefault();
+                    return false;
+                }
+
+                return true;
+            }
+
+            setMinDate(checkinInput);
+            setMinDate(checkoutInput);
 
             form.addEventListener('submit', async function(event) {
+                if (!validateDates(event)) {
+                    return;
+                }
+
                 event.preventDefault();
 
                 const formData = new FormData(form);

@@ -55,30 +55,38 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.cancel-booking').on('click', function() {
-                var bookingId = $(this).data('booking-id');
+        $('.cancel-booking').on('click', function() {
+            var bookingId = $(this).data('booking-id');
 
-                $.ajax({
-                    url: '{{ route('cancel.booking') }}',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        booking_id: bookingId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#booking-' + bookingId).remove();
-                            alert(response.message);
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        alert('An error occurred while cancelling the booking.');
+            $.ajax({
+                url: '{{ route('cancel.booking') }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    booking_id: bookingId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#booking-' + bookingId).remove();
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
                     }
-                });
+                },
+                error: function(xhr) {
+                    console.log(xhr); // Log the full response for debugging
+                    var response = xhr.responseJSON;
+                    if (response && response.message) {
+                        alert(response.message);
+                    } else {
+                        alert('An error occurred while cancelling the booking. Status: ' + xhr.status);
+                    }
+                }
             });
         });
+    });
+
+        
     </script>
 </body>
 </html>

@@ -97,11 +97,10 @@
                     <th>Phone</th>
                     <th>Arrival Date</th>
                     <th>Departure Date</th>
-                    <th>Status</th>
+                    
                     <th>Title</th>
                     <th>Price</th>
-                    <th>Delete</th>
-                    <th>Action</th>
+                   
                 </tr>
             </thead>
             <tbody>
@@ -115,23 +114,13 @@
                     <td>{{ $data->end_date }}</td>
                     
 
-                    <td>
-                    @if($data->status=="approved")
-                    <span style="color:green">approved</span>
-                    @endif
-                    @if($data->status=="rejected")
-                    <span style="color:red">rejected</span>
-                    @endif
+                   
                     
 
                     </td>
                     <td>{{ $data->room ? $data->room->room_title : 'N/A' }}</td>
                     <td>{{ $data->room ? $data->room->price : 'N/A' }}</td>
-                    <td>
-                        <a href="{{ url('delete_bookings', $data->id) }}" onclick="return confirm('Are you sure to delete?');"  class="delete-trigger">
-                            <i class="material-icons delete-icon">delete</i>
-                        </a>
-                    </td>
+                    
                     <td>
                     
 

@@ -14,11 +14,12 @@
             border-radius: 4px;
             background-color: white;
             box-shadow: 0 1px 3px 0 #e6ebf1;
-            transition: box-shadow 150ms ease;
+            transition: box-shadow 150ms ease, border-color 150ms ease;
         }
 
         .StripeElement--focus {
             box-shadow: 0 1px 3px 0 #cfd7df;
+            border-color: #007bff;
         }
 
         .StripeElement--invalid {
@@ -28,35 +29,86 @@
         .StripeElement--webkit-autofill {
             background-color: #fefde5 !important;
         }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 8px;
+            border:2px solid white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            background-color:lightgreen;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: -8px;
+            left: 12px;
+            background: white;
+            padding: 0 4px;
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .form-group input:focus + label,
+        .form-group .StripeElement--focus + label {
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Payment</h2>
-        @if(session('message'))
-            <div class="alert alert-info">{{ session('message') }}</div>
-        @endif
-        <form id="payment-form" method="post" action="{{ route('process.payment') }}">
-            @csrf
-            @if($bookingData)
-                <input type="hidden" name="room_id" value="{{ $bookingData['room_id'] }}">
-                <input type="hidden" name="name" value="{{ $bookingData['name'] }}">
-                <input type="hidden" name="email" value="{{ $bookingData['email'] }}">
-                <input type="hidden" name="phone" value="{{ $bookingData['phone'] }}">
-                <input type="hidden" name="startDate" value="{{ $bookingData['startDate'] }}">
-                <input type="hidden" name="endDate" value="{{ $bookingData['endDate'] }}">
-                <input type="hidden" name="amount" value="{{ $bookingData['amount'] }}">
+    <div class="container">
+        <div class="card">
+            <h2 class="mb-4">Payment</h2>
+            @if(session('message'))
+                <div class="alert alert-info">{{ session('message') }}</div>
             @endif
-            <input type="hidden" name="payment_intent_id" id="payment-intent-id">
+            <form id="payment-form" method="post" action="{{ route('process.payment') }}">
+                @csrf
+                @if($bookingData)
+                    <input type="hidden" name="room_id" value="{{ $bookingData['room_id'] }}">
+                    <input type="hidden" name="name" value="{{ $bookingData['name'] }}">
+                    <input type="hidden" name="email" value="{{ $bookingData['email'] }}">
+                    <input type="hidden" name="phone" value="{{ $bookingData['phone'] }}">
+                    <input type="hidden" name="startDate" value="{{ $bookingData['startDate'] }}">
+                    <input type="hidden" name="endDate" value="{{ $bookingData['endDate'] }}">
+                    <input type="hidden" name="amount" value="{{ $bookingData['amount'] }}">
+                @endif
+                <input type="hidden" name="payment_intent_id" id="payment-intent-id">
 
-            <div class="form-group">
-                <label for="card-element" class="mb-2">Credit or Debit Card</label>
-                <div id="card-element" class="StripeElement StripeElement--empty"></div>
-                <div id="card-errors" role="alert" class="text-danger mt-2"></div>
-            </div>
+                <div class="form-group">
+                    <div id="card-element" class="StripeElement StripeElement--empty"></div>
+                    <label for="card-element" class="mb-2">Credit or Debit Card</label>
+                    <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                </div>
 
-            <button id="pay-btn" class="btn btn-primary mt-4" type="button" onclick="createPaymentIntent()">Pay @if($bookingData) ${{ $bookingData['amount'] }} @endif</button>
-        </form>
+                <button id="pay-btn" class="btn btn-primary mt-4 w-100" type="button" onclick="createPaymentIntent()">Pay @if($bookingData) INR{{ $bookingData['amount'] }} @endif</button>
+            </form>
+        </div>
     </div>
 
     <script src="https://js.stripe.com/v3/"></script>

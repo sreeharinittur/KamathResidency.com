@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Booking;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminController extends Controller
 {
@@ -23,7 +25,10 @@ class AdminController extends Controller
 
             else if($usertype=="admin")
             {
-                return view ('admin.index');
+                // Fetch user messages
+                $messages = Message::all(); // Adjust this as needed, e.g., pagination or filters
+
+                return view ('admin.index', compact('messages'));
             }
             
             else
@@ -31,7 +36,6 @@ class AdminController extends Controller
                 return redirect()->back();
             }
         }
-
     }
 
     public function home()
@@ -87,7 +91,7 @@ class AdminController extends Controller
                 }
             }
     
-            return redirect()->route('admin.create_room')->with('success', 'Room created successfully!');
+            return redirect()->route('create_room')->with('success', 'Room created successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         
@@ -100,6 +104,7 @@ class AdminController extends Controller
     $rooms = Room::with('images')->get();
     return view('admin.show_rooms', compact('rooms'));
 }
+
 
         public function bookings()
          {
@@ -117,13 +122,24 @@ class AdminController extends Controller
 
         public function delete_bookings($id)
         {
-            $data=Booking::find($id);
+            $booking = Booking::find($id);
 
-            $data->delete();
-
-            return redirect()->back();
+            if ($booking) {
+                $booking->delete();
+                return redirect()->route('bookings')->with('success', 'Booking deleted successfully.');
+            } else {
+                return redirect()->route('bookings')->with('error', 'Booking not found.');
+            }
 
         }
+
+        public function showMessages()
+        {
+            $messages = DB::table('messages')->get(); // Fetch all messages from the database
+            return view('admin.messages', compact('messages')); // Pass messages to the view
+        }
+        
+       
 
        
 

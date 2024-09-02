@@ -11,9 +11,6 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
-use Vonage\Client;
-use Vonage\Client\Credentials\Basic;
-use Vonage\SMS\Message\SMS;
 
 class HomeController extends Controller
 {
@@ -28,6 +25,21 @@ class HomeController extends Controller
     {
         $room = Room::find($id);
         return view('room_details', compact('room'));
+    }
+
+    public function aboutus()
+    {
+        return view('aboutus');
+    }
+
+    public function contactus()
+    {
+        return view('contactus');
+    }
+
+    public function gallery()
+    {
+        return view('gallery');
     }
 
     public function show_payment_page(Request $request)
@@ -61,63 +73,54 @@ class HomeController extends Controller
     
 
     public function process_payment(Request $request)
-{
-    Stripe::setApiKey(env('STRIPE_SK'));
-
-    $bookingData = Session::get('bookingData');
-
-    Log::info('Booking Data: ', $bookingData);
-
-    if (!$bookingData) {
-        return response()->json(['error' => 'Booking data not found in session']);
-    }
-
-    try {
-        $paymentIntent = PaymentIntent::retrieve($request->payment_intent_id);
-
-        if ($paymentIntent->status === 'succeeded') {
-            $booking = Booking::create([
-                'room_id' => $bookingData['room_id'],
-                'name' => $bookingData['name'],
-                'email' => $bookingData['email'],
-                'phone' => $bookingData['phone'],
-                'payment_status' => 'done',
-                'status' => 'confirmed',
-                'start_date' => $bookingData['startDate'],
-                'end_date' => $bookingData['endDate'],
-                'amount' => $bookingData['amount']
-            ]);
-
-            // Send booking confirmation SMS using Vonage
-            $basic  = new Basic(env('VONAGE_API_KEY'), env('VONAGE_API_SECRET'));
-            $client = new Client($basic);
-
-            $message = 'Dear ' . $bookingData['name'] . ', your booking for Room ID: ' . $bookingData['room_id'] . ' has been confirmed. Your stay is from ' . $bookingData['startDate'] . ' to ' . $bookingData['endDate'] . '. Thank you for choosing our service.';
-
-            $response = $client->sms()->send(
-                new SMS('+91'.$bookingData['phone'], 'YourCompany', $message)
-            );
-
-            $messageStatus = $response->current()->getStatus();
-
-            if ($messageStatus == 0) {
-                Log::info('SMS sent successfully to ' . $bookingData['phone']);
-            } else {
-                Log::error('Failed to send SMS to ' . $bookingData['phone'] . '. Status: ' . $messageStatus);
-            }
-
-            // Clear session data after SMS has been sent
-            Session::forget('bookingData');
-
-            return response()->json(['success' => true, 'message' => 'Payment succeeded and booking confirmed. Confirmation SMS sent.']);
-        } else {
-            return response()->json(['error' => 'Payment failed']);
+    {
+        Stripe::setApiKey(env('STRIPE_SK'));
+    
+        $bookingData = Session::get('bookingData');
+    
+        Log::info('Booking Data: ', $bookingData);
+    
+        if (!$bookingData) {
+            return response()->json(['error' => 'Booking data not found in session']);
         }
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()]);
+    
+        try {
+            $paymentIntent = PaymentIntent::retrieve($request->payment_intent_id);
+    
+            if ($paymentIntent->status === 'succeeded') {
+                $booking = Booking::create([
+                    'room_id' => $bookingData['room_id'],
+                    'name' => $bookingData['name'],
+                    'email' => $bookingData['email'],
+                    'phone' => $bookingData['phone'],
+                    'payment_status' => 'done',
+                    'status' => 'confirmed',
+                    'start_date' => $bookingData['startDate'],
+                    'end_date' => $bookingData['endDate'],
+                    'amount' => $bookingData['amount']
+                ]);
+    
+                $message = 'Dear ' . $bookingData['name'] . ', your booking for Room ID: ' . $bookingData['room_id'] . ' has been confirmed. Your stay is from ' . $bookingData['startDate'] . ' to ' . $bookingData['endDate'] . '. Thank you for choosing our service.';
+    
+                $smsSent = $this->twilioService->sendSMS('+91' . $bookingData['phone'], $message);
+    
+                if ($smsSent) {
+                    Log::info('SMS sent successfully to ' . $bookingData['phone']);
+                } else {
+                    Log::error('Failed to send SMS to ' . $bookingData['phone']);
+                }
+    
+                // Clear session data after SMS has been sent
+                Session::forget('bookingData');
+    
+                return response()->json(['success' => true, 'message' => 'Payment succeeded and booking confirmed. Confirmation SMS sent.']);
+            } else {
+                return response()->json(['error' => 'Payment failed']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
     }
-}
-
 public function cancelBooking(Request $request)
 {
     $bookingId = $request->input('booking_id');
@@ -126,6 +129,15 @@ public function cancelBooking(Request $request)
     if (!$booking || $booking->status === 'cancelled') {
         return response()->json(['error' => 'Booking not found or already cancelled']);
     }
+
+    $currentDate = new \DateTime();
+    $checkInDate = new \DateTime($booking->start_date);
+
+    // Check if the booking date is in the past
+    if ($checkInDate < $currentDate) {
+        return response()->json(['message' => 'Cannot cancel booking. The check-in date has already passed.'], 400);
+    }
+    else{
 
     // Calculate refund amount based on your cancellation policy
     $refundAmount = $this->calculateRefundAmount($booking);
@@ -141,7 +153,7 @@ public function cancelBooking(Request $request)
 
     return response()->json(['success' => true, 'message' => 'Booking cancelled successfully and refund processed']);
     
-}
+}}
 
 private function calculateRefundAmount($booking)
 {
@@ -174,19 +186,18 @@ public function sendBookingCancellationSMS($booking)
     $phoneNumber = $booking->phone;
     $message = "Dear {$booking->name}, your booking (ID: {$booking->id}) has been cancelled. Refund Amount: {$booking->refund_amount}";
 
-    $basic  = new Basic(env('VONAGE_API_KEY'), env('VONAGE_API_SECRET'));
-    $client = new Client($basic);
+    // Use TwilioService to send the SMS
+    $smsSent = $this->twilioService->sendSMS('+91' . $phoneNumber, $message);
 
-    $response = $client->sms()->send(
-        new SMS('+91'.$phoneNumber, 'YourCompanyName', $message)
-    );
-
-    if ($response->current()->getStatus() == 0) {
+    if ($smsSent) {
         Log::info("SMS sent successfully to {$phoneNumber}");
     } else {
         Log::error("Failed to send SMS to {$phoneNumber}");
     }
-    
 }
 
+public function menu()
+{
+    return view('menu');
+}
 }

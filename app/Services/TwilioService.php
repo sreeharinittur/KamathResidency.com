@@ -10,13 +10,13 @@ class TwilioService
 
     public function __construct()
     {
-        $this->client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+        $this->client = new Client(env('TWILIO_ACCOUNT_SID'), env('TWILIO_AUTH_TOKEN'));
     }
 
     public function sendSms($to, $message)
     {
         $this->client->messages->create($to, [
-            'from' => env('TWILIO_FROM'),
+            'from' => env('TWILIO_NUMBER'),
             'body' => $message,
         ]);
     }

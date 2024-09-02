@@ -5,6 +5,10 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MessageController;
+
 
 route::get('/',[AdminController::class,'home']);
 
@@ -42,7 +46,7 @@ Route::get('logout', function ()
     return Redirect::to('/');
 })->name('logout');
 
-route::get('/create_room',[AdminController::class,'create_room']);
+route::get('/create_room',[AdminController::class,'create_room'])->name('create_room');
 
 route::post('/add_room',[AdminController::class,'add_room']);
 
@@ -60,6 +64,26 @@ route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
 
 route::get('/mybookings', [AdminController::class, 'mybookings'])->name('mybookings');
 
+
+Route::delete('/bookings/{id}', [AdminController::class, 'deleteBooking'])->name('bookings.delete');
+
+route::get('/aboutus', [HomeController::class, 'aboutus'])->name('aboutus');
+
+route::get('/contactus', [HomeController::class, 'contactus'])->name('contactus');
+
+route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+
+route::get('/menu', [HomeController::class, 'menu'])->name('menu');
+
+
+
+
+Route::get('/admin/messages', [MessageController::class, 'showMessages'])->name('admin.messages');
+
+
+
+
+
 Route::post('/checkAvailability', [RoomController::class, 'checkAvailability'])->name('checkAvailability');
 
 
@@ -67,6 +91,13 @@ Route::get('/payment/{id}', [HomeController::class, 'show_payment_page'])->name(
 Route::post('process_payment', [HomeController::class, 'process_payment'])->name('process.payment');
 Route::post('/create-payment-intent', [HomeController::class, 'create_payment_intent'])->name('create.payment.intent');
 
-
+Route::post('/submit', [ContactController::class, 'submit'])->name('submit');
 
 Route::post('/cancel_booking', [HomeController::class, 'cancelBooking'])->name('cancel.booking');
+
+Route::get('/fetch-bookings-data', [AnalyticsController::class, 'fetchBookingsData'])->name('fetch.bookings.data');
+
+
+// web.php
+Route::post('/submit', [ContactController::class, 'storeMessage']);
+

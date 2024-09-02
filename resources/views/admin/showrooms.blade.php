@@ -165,8 +165,21 @@
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
 
+        const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    const bookingForm = document.getElementById('bookingForm');
+
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
+
+            
+
+
+             
+
+            
+            
+
 
             const formData = new FormData(form);
             const response = await fetch(checkAvailabilityRoute, 
@@ -247,7 +260,7 @@
         roomDescription.textContent = room.description;
 
         const roomPrice = document.createElement('span');
-        roomPrice.textContent = `Price: $${room.price}`;
+        roomPrice.textContent = `Price: ${room.price}`;
 
         const detailsButton = document.createElement('a');
         detailsButton.href = `/room_details/${room.id}`;
@@ -269,6 +282,7 @@
 }
 
     });
+    
 </script>
 
 </body>

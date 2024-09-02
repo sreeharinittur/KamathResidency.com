@@ -123,7 +123,7 @@
                         </div>
                         <div class="room-info">
                             <p><strong>Description:</strong> {{ $room->description }}</p>
-                            <p><strong>Price:</strong> ${{ $room->price }}</p>
+                            <p><strong>Price:</strong> INR{{ $room->price }}</p>
                             <p><strong>Wifi:</strong> {{ $room->wifi ? 'Yes' : 'No' }}</p>
                             <p><strong>Room Type:</strong> {{ ucfirst($room->room_type) }}</p>
                         </div>

@@ -487,6 +487,11 @@ button {
 .about_img {
      margin-right: 40px;
      overflow: hidden;
+     width: 100%; /* Make the image responsive */
+     height:500px; /* Maintain the aspect ratio */
+     display: block; /* Remove the default inline-block space */
+     image-rendering: -webkit-optimize-contrast; /* For better rendering in some browsers */
+     image-rendering: crisp-edges; /* For better rendering in other browsers */
 }
 
 .about_img figure {
